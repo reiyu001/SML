@@ -1,0 +1,10 @@
+{
+  "description": "Analyze programming language text to identify and display its lexemes and tokens, helping developers inspect code structure in one convenient interface.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
