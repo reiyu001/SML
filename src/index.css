@@ -200,6 +200,11 @@
   font: 500 10px 'DM Mono', monospace;
 }
 
+.count-badge.has-errors {
+  color: #8a3c32;
+  background: #f8e6e1;
+}
+
 .table-wrap {
   position: relative;
   height: 474px;
@@ -251,6 +256,10 @@ tbody tr:hover {
   background: #f5f8f2;
 }
 
+tbody tr.error-row {
+  background: #fff7f5;
+}
+
 td code {
   font: 500 12px 'DM Mono', monospace;
 }
@@ -275,6 +284,12 @@ td code {
   font: 500 9px 'DM Mono', monospace;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.token-pill.error-token {
+  color: #913b31;
+  border-color: #efc8c1;
+  background: #fbe9e5;
 }
 
 .empty-state {
@@ -486,6 +501,12 @@ textarea::selection {
 
 .analyze-button:active {
   transform: translateY(0);
+}
+
+.analyze-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
 }
 
 .analyze-button svg {
