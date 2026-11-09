@@ -2,9 +2,11 @@
   "name": "figma-make-app",
   "private": true,
   "version": "1.0.0",
+  "packageManager": "pnpm@11.25.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "python -m uvicorn backend.server:app --reload --host 127.0.0.1 --port 8000",
     "build": "vite build",
     "preview": "vite preview",
     "format": "oxfmt"

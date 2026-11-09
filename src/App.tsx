@@ -3,96 +3,29 @@ import { useMemo, useState } from "react"
 type TokenRow = {
   lexeme: string
   token: string
+  line: number
+  column: number
+  message?: string
+  isError: boolean
 }
 
-const sampleCode = `measure distance = 12.5 meter;
-measure time = 2 second;
+type ApiToken = {
+  type: string
+  lexeme: string
+  line: number
+  column: number
+  value: unknown
+}
 
-speed = distance / time;
+type AnalyzeResponse = {
+  tokens: ApiToken[]
+  errors: ApiToken[]
+}
+
+const sampleCode = `let distance = 12.5m;
+let time = 2s;
+let speed = distance / time;
 print("Speed:", speed);`
-
-const keywords = new Set([
-  "break",
-  "case",
-  "const",
-  "continue",
-  "default",
-  "else",
-  "false",
-  "for",
-  "function",
-  "if",
-  "let",
-  "measure",
-  "null",
-  "print",
-  "return",
-  "true",
-  "var",
-  "while",
-])
-
-const operators = new Set([
-  "+",
-  "-",
-  "*",
-  "/",
-  "%",
-  "=",
-  "==",
-  "===",
-  "!=",
-  "!==",
-  "<",
-  ">",
-  "<=",
-  ">=",
-  "&&",
-  "||",
-  "!",
-  "++",
-  "--",
-  "+=",
-  "-=",
-  "*=",
-  "/=",
-  "=>",
-])
-
-const punctuationNames: Record<string, string> = {
-  "(": "LEFT_PAREN",
-  ")": "RIGHT_PAREN",
-  "{": "LEFT_BRACE",
-  "}": "RIGHT_BRACE",
-  "[": "LEFT_BRACKET",
-  "]": "RIGHT_BRACKET",
-  ",": "COMMA",
-  ".": "DOT",
-  ":": "COLON",
-  ";": "SEMICOLON",
-}
-
-function tokenize(source: string): TokenRow[] {
-  const matches =
-    source.match(
-      /\/\/[^\n]*|\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\d+(?:\.\d+)?|[A-Za-z_$][\w$]*|===|!==|==|!=|<=|>=|&&|\|\||\+\+|--|\+=|-=|\*=|\/=|=>|[+\-*/%=<>!]|[()[\]{},.:;]/g,
-    ) ?? []
-
-  return matches.map((lexeme) => {
-    let token = "UNKNOWN"
-
-    if (lexeme.startsWith("//") || lexeme.startsWith("/*")) token = "COMMENT"
-    else if (/^["']/.test(lexeme)) token = "STRING_LITERAL"
-    else if (/^\d/.test(lexeme))
-      token = lexeme.includes(".") ? "DECIMAL_LITERAL" : "INTEGER_LITERAL"
-    else if (keywords.has(lexeme)) token = `KEYWORD_${lexeme.toUpperCase()}`
-    else if (/^[A-Za-z_$]/.test(lexeme)) token = "IDENTIFIER"
-    else if (operators.has(lexeme)) token = "OPERATOR"
-    else if (punctuationNames[lexeme]) token = punctuationNames[lexeme]
-
-    return { lexeme, token }
-  })
-}
 
 function CodeIcon() {
   return (
@@ -114,17 +47,51 @@ export default function App() {
   const [code, setCode] = useState(sampleCode)
   const [rows, setRows] = useState<TokenRow[]>([])
   const [hasAnalyzed, setHasAnalyzed] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [requestError, setRequestError] = useState("")
   const lineCount = useMemo(() => code.split("\n").length, [code])
-
-  const analyze = () => {
-    setRows(tokenize(code))
-    setHasAnalyzed(true)
+  const errorCount = rows.filter((row) => row.isError).length
+  const analyze = async () => {
+    setIsAnalyzing(true)
+    setRequestError("")
+    try {
+      const response = await fetch("/api/tokenize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ source: code, keepComments: false }),
+      })
+      if (!response.ok) throw new Error(`Analyzer returned ${response.status}`)
+      const result = (await response.json()) as AnalyzeResponse
+      const nextRows = [...result.tokens, ...result.errors]
+        .sort((a, b) => a.line - b.line || a.column - b.column)
+        .map((item) => ({
+          lexeme: item.lexeme,
+          token: item.type,
+          line: item.line,
+          column: item.column,
+          message:
+            item.type === "ERROR" && typeof item.value === "string"
+              ? item.value
+              : undefined,
+          isError: item.type === "ERROR",
+        }))
+      setRows(nextRows)
+      setHasAnalyzed(true)
+    } catch (error) {
+      setRows([])
+      setRequestError(
+        error instanceof Error ? error.message : "Could not reach the analyzer",
+      )
+    } finally {
+      setIsAnalyzing(false)
+    }
   }
 
   const clear = () => {
     setCode("")
     setRows([])
     setHasAnalyzed(false)
+    setRequestError("")
   }
 
   return (
@@ -170,7 +137,10 @@ export default function App() {
                 <p>Recognized source elements</p>
               </div>
             </div>
-            <span className="count-badge">{rows.length} tokens</span>
+            <span className={`count-badge ${errorCount ? "has-errors" : ""}`}>
+              {rows.length - errorCount} tokens
+              {errorCount > 0 && ` · ${errorCount} errors`}
+            </span>
           </div>
 
           <div className="table-wrap">
@@ -187,15 +157,25 @@ export default function App() {
               </thead>
               <tbody>
                 {rows.map((row, index) => (
-                  <tr key={`${row.lexeme}-${index}`}>
+                  <tr
+                    className={row.isError ? "error-row" : undefined}
+                    key={`${row.line}-${row.column}-${index}`}
+                    title={row.message}
+                  >
                     <td>
                       <span className="row-number">
-                        {String(index + 1).padStart(2, "0")}
+                        {row.line}:{row.column}
                       </span>
                       <code>{row.lexeme}</code>
                     </td>
                     <td>
-                      <span className="token-pill">{row.token}</span>
+                      <span
+                        className={`token-pill ${
+                          row.isError ? "error-token" : ""
+                        }`}
+                      >
+                        {row.message ?? row.token}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -207,11 +187,18 @@ export default function App() {
                 <div className="empty-icon">
                   <SparkIcon />
                 </div>
-                <h4>{hasAnalyzed ? "No tokens found" : "Ready to analyze"}</h4>
+                <h4>
+                  {requestError
+                    ? "Analyzer unavailable"
+                    : hasAnalyzed
+                      ? "No tokens found"
+                      : "Ready to analyze"}
+                </h4>
                 <p>
-                  {hasAnalyzed
-                    ? "Add valid source code and try again."
-                    : "Your lexemes and tokens will appear here after analysis."}
+                  {requestError ||
+                    (hasAnalyzed
+                      ? "Add source code and try again."
+                      : "Your lexemes and tokens will appear here after analysis.")}
                 </p>
               </div>
             )}
@@ -258,7 +245,7 @@ export default function App() {
                 onChange={(event) => setCode(event.target.value)}
                 onKeyDown={(event) => {
                   if ((event.ctrlKey || event.metaKey) && event.key === "Enter")
-                    analyze()
+                    void analyze()
                 }}
                 placeholder="// Enter your programming language here..."
                 spellCheck={false}
@@ -277,8 +264,13 @@ export default function App() {
               Clear
             </button>
             <span className="shortcut">Ctrl + Enter</span>
-            <button className="analyze-button" type="button" onClick={analyze}>
-              Analyze language
+            <button
+              className="analyze-button"
+              type="button"
+              onClick={() => void analyze()}
+              disabled={isAnalyzing}
+            >
+              {isAnalyzing ? "Analyzing…" : "Analyze language"}
               <svg viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M4 10h12m-5-5 5 5-5 5" />
               </svg>
