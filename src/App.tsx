@@ -22,9 +22,12 @@ type AnalyzeResponse = {
   errors: ApiToken[]
 }
 
-const sampleCode = `let distance = 12.5m;
-let time = 2s;
+const sampleCode = `let distance = 100m;
+let time = 9.5s;
 let speed = distance / time;
+
+print("Distance:", distance);
+print("Time:", time);
 print("Speed:", speed);`
 
 function CodeIcon() {
@@ -106,26 +109,7 @@ export default function App() {
             <p>Lexical analysis workspace</p>
           </div>
         </div>
-        <div className="status">
-          <span />
-          Analyzer ready
-        </div>
       </header>
-
-      <section className="intro">
-        <div>
-          <span className="eyebrow">Compiler toolkit</span>
-          <h2>
-            Understand your source,
-            <br />
-            one token at a time.
-          </h2>
-        </div>
-        <p>
-          Enter your programming language syntax and run the analyzer to
-          identify every lexeme and its corresponding token.
-        </p>
-      </section>
 
       <section className="workspace">
         <article className="panel results-panel">
@@ -278,11 +262,6 @@ export default function App() {
           </div>
         </article>
       </section>
-
-      <footer>
-        <p>SML lexical analyzer</p>
-        <p>Built for precise language inspection</p>
-      </footer>
     </main>
   )
 }
