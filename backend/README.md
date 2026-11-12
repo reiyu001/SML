@@ -9,11 +9,11 @@ the Python standard library.
 Run these commands from the repository root:
 
 ```powershell
-python -m backend.lexer examples/valid_basics.sml
+python -m backend.lexer examples/valid_operators.sml
 python -m backend.lexer -c "let x = 5m;"
 python -m backend.lexer examples/valid_comments.sml --comments
 python -m backend.lexer examples/valid_units.sml --json
-Get-Content examples/valid_basics.sml | python -m backend.lexer
+Get-Content examples/valid_units.sml | python -m backend.lexer
 ```
 
 The process exits with status `0` when no lexical errors are found and `1`
@@ -27,8 +27,12 @@ The lexer produces the following categories:
   `NOISE_WORD`, and `IDENTIFIER`
 - `INTEGER_LITERAL`, `DECIMAL_LITERAL`, `STRING_LITERAL`, and
   `QUANTITY_LITERAL`
-- `ASSIGNMENT_OPERATOR`, `ARITHMETIC_OPERATOR`, `RELATIONAL_OPERATOR`,
-  `LOGICAL_OPERATOR`, and `UPDATE_OPERATOR`
+- `ASSIGN`, `PLUS_ASSIGN`, `MINUS_ASSIGN`, `MULTIPLY_ASSIGN`, and
+  `DIVIDE_ASSIGN`
+- `PLUS`, `MINUS`, `MULTIPLY`, `DIVIDE`, `MODULO`, and `POWER`
+- `EQUAL`, `NOT_EQUAL`, `LESS_THAN`, `GREATER_THAN`,
+  `LESS_THAN_OR_EQUAL`, and `GREATER_THAN_OR_EQUAL`
+- `LOGICAL_AND`, `LOGICAL_OR`, `LOGICAL_NOT`, `INCREMENT`, and `DECREMENT`
 - `SEMICOLON`, `LPAREN`, `RPAREN`, `LBRACE`, `RBRACE`, `LBRACKET`,
   `RBRACKET`, `COMMA`, and `COLON`
 - `COMMENT` when `--comments` is enabled
@@ -43,6 +47,9 @@ quantity parts, or an error message. Internally, a lexer mark is the tuple
 
 - The lexer uses maximal munch, so the longest valid lexeme wins. For example,
   `+=` is one operator rather than `+` followed by `=`.
+- Each operator symbol has a distinct token type. `PLUS` and `MINUS` identify
+  the symbols themselves; deciding whether they are unary or binary belongs to
+  a future parser.
 - Quantity units must be attached to the magnitude. `100m`, `9.58s`, and
   `9.8[m/s^2]` are quantity literals. `100 m` and `9.8 [m/s^2]` become
   separate tokens and are rejected later by the parser.
