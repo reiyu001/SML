@@ -37,6 +37,6 @@ Vite proxies requests under `/api` to `http://127.0.0.1:8000`. Set
 ## Checks
 
 ```powershell
-python -m unittest backend.test_server backend.test_examples
+python -m unittest backend.test_server backend.test_examples backend.test_operators
 npm run build
 ```

@@ -39,20 +39,20 @@ for _w in NOISE_WORDS:
     WORD_CLASSES[_w] = "NOISE_WORD"
 
 TWO_CHAR_OPERATORS = {
-    "+=": "ASSIGNMENT_OPERATOR", "-=": "ASSIGNMENT_OPERATOR",
-    "*=": "ASSIGNMENT_OPERATOR", "/=": "ASSIGNMENT_OPERATOR",
-    "==": "RELATIONAL_OPERATOR", "!=": "RELATIONAL_OPERATOR",
-    "<=": "RELATIONAL_OPERATOR", ">=": "RELATIONAL_OPERATOR",
-    "&&": "LOGICAL_OPERATOR", "||": "LOGICAL_OPERATOR",
-    "++": "UPDATE_OPERATOR", "--": "UPDATE_OPERATOR",
+    "+=": "PLUS_ASSIGN", "-=": "MINUS_ASSIGN",
+    "*=": "MULTIPLY_ASSIGN", "/=": "DIVIDE_ASSIGN",
+    "==": "EQUAL", "!=": "NOT_EQUAL",
+    "<=": "LESS_THAN_OR_EQUAL", ">=": "GREATER_THAN_OR_EQUAL",
+    "&&": "LOGICAL_AND", "||": "LOGICAL_OR",
+    "++": "INCREMENT", "--": "DECREMENT",
 }
 ONE_CHAR_OPERATORS = {
-    "=": "ASSIGNMENT_OPERATOR",
-    "+": "ARITHMETIC_OPERATOR", "-": "ARITHMETIC_OPERATOR",
-    "*": "ARITHMETIC_OPERATOR", "/": "ARITHMETIC_OPERATOR",
-    "%": "ARITHMETIC_OPERATOR", "^": "ARITHMETIC_OPERATOR",
-    "<": "RELATIONAL_OPERATOR", ">": "RELATIONAL_OPERATOR",
-    "!": "LOGICAL_OPERATOR",
+    "=": "ASSIGN",
+    "+": "PLUS", "-": "MINUS",
+    "*": "MULTIPLY", "/": "DIVIDE",
+    "%": "MODULO", "^": "POWER",
+    "<": "LESS_THAN", ">": "GREATER_THAN",
+    "!": "LOGICAL_NOT",
 }
 OPERATOR_START = set("+-*/%^<>=!&|")
 
