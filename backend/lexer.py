@@ -17,26 +17,30 @@ WHITESPACE = set(" \t\r\n")
 CHARACTER = ALPHA | DIGITS | SYMBOLS | WHITESPACE
 IDENT_REST = ALPHA | DIGITS | {"_"}
 
-KEYWORDS = {
-    "let", "const", "fn", "return", "if", "else", "for", "while",
-    "break", "continue", "print", "input", "assert", "as",
+KEYWORD_TOKENS = {
+    "let": "LET", "const": "CONST", "fn": "FN", "return": "RETURN",
+    "if": "IF", "else": "ELSE", "for": "FOR", "while": "WHILE",
+    "break": "BREAK", "continue": "CONTINUE", "print": "PRINT",
+    "input": "INPUT", "assert": "ASSERT", "as": "AS",
 }
-PRIMITIVE_TYPES = {"int", "float", "bool", "text"}
-BOOLEAN_LITERALS = {"true", "false"}
-NAMED_DIMENSIONS = {"Length", "Mass", "Time", "Force"}
-NOISE_WORDS = {"to", "then", "do"}
+TYPE_TOKENS = {
+    "int": "TYPE_INT", "float": "TYPE_FLOAT",
+    "bool": "TYPE_BOOL", "text": "TYPE_TEXT",
+}
+BOOLEAN_TOKENS = {"true": "TRUE", "false": "FALSE"}
+DIMENSION_TOKENS = {
+    "Length": "DIMENSION_LENGTH", "Mass": "DIMENSION_MASS",
+    "Time": "DIMENSION_TIME", "Force": "DIMENSION_FORCE",
+}
+NOISE_WORD_TOKENS = {"to": "TO", "then": "THEN", "do": "DO"}
 
-WORD_CLASSES = {}
-for _w in KEYWORDS:
-    WORD_CLASSES[_w] = "KEYWORD"
-for _w in PRIMITIVE_TYPES:
-    WORD_CLASSES[_w] = "PRIMITIVE_TYPE"
-for _w in BOOLEAN_LITERALS:
-    WORD_CLASSES[_w] = "BOOLEAN_LITERAL"
-for _w in NAMED_DIMENSIONS:
-    WORD_CLASSES[_w] = "NAMED_DIMENSION"
-for _w in NOISE_WORDS:
-    WORD_CLASSES[_w] = "NOISE_WORD"
+WORD_CLASSES = {
+    **KEYWORD_TOKENS,
+    **TYPE_TOKENS,
+    **BOOLEAN_TOKENS,
+    **DIMENSION_TOKENS,
+    **NOISE_WORD_TOKENS,
+}
 
 TWO_CHAR_OPERATORS = {
     "+=": "PLUS_ASSIGN", "-=": "MINUS_ASSIGN",

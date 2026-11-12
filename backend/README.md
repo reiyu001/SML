@@ -21,10 +21,16 @@ when the input contains lexical errors.
 
 ## Token categories
 
-The lexer produces the following categories:
+The lexer produces the following token types:
 
-- `KEYWORD`, `PRIMITIVE_TYPE`, `NAMED_DIMENSION`, `BOOLEAN_LITERAL`,
-  `NOISE_WORD`, and `IDENTIFIER`
+- Keywords: `LET`, `CONST`, `FN`, `RETURN`, `IF`, `ELSE`, `FOR`, `WHILE`,
+  `BREAK`, `CONTINUE`, `PRINT`, `INPUT`, `ASSERT`, and `AS`
+- Primitive types: `TYPE_INT`, `TYPE_FLOAT`, `TYPE_BOOL`, and `TYPE_TEXT`
+- Boolean literals: `TRUE` and `FALSE`
+- Named dimensions: `DIMENSION_LENGTH`, `DIMENSION_MASS`, `DIMENSION_TIME`,
+  and `DIMENSION_FORCE`
+- Noise words: `TO`, `THEN`, and `DO`
+- User-defined names: `IDENTIFIER`
 - `INTEGER_LITERAL`, `DECIMAL_LITERAL`, `STRING_LITERAL`, and
   `QUANTITY_LITERAL`
 - `ASSIGN`, `PLUS_ASSIGN`, `MINUS_ASSIGN`, `MULTIPLY_ASSIGN`, and
@@ -50,6 +56,8 @@ quantity parts, or an error message. Internally, a lexer mark is the tuple
 - Each operator symbol has a distinct token type. `PLUS` and `MINUS` identify
   the symbols themselves; deciding whether they are unary or binary belongs to
   a future parser.
+- Every fixed language word has a distinct token type. Variable user-defined
+  names remain `IDENTIFIER` tokens.
 - Quantity units must be attached to the magnitude. `100m`, `9.58s`, and
   `9.8[m/s^2]` are quantity literals. `100 m` and `9.8 [m/s^2]` become
   separate tokens and are rejected later by the parser.
