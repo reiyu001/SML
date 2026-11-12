@@ -30,14 +30,6 @@ print("Distance:", distance);
 print("Time:", time);
 print("Speed:", speed);`
 
-function CodeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m8.5 7-5 5 5 5M15.5 7l5 5-5 5M14 4l-4 16" />
-    </svg>
-  )
-}
-
 function SparkIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -101,13 +93,8 @@ export default function App() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <div className="brand-mark">
-            <CodeIcon />
-          </div>
-          <div>
-            <h1>Standard Measurement Langugage</h1>
-            <p>Lexical analysis workspace</p>
-          </div>
+          <img className="brand-logo" src="/verity.png" alt="Verity" />
+          <h1>Standard Measurement Language</h1>
         </div>
       </header>
 
